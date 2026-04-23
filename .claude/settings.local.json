@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(claude-api)",
+      "Bash(uv --version)",
+      "Bash(where uv *)",
+      "Bash(powershell -Command \"uv --version\")",
+      "Bash(powershell *)",
+      "Bash(powershell.exe -Command \"where.exe uv\")",
+      "Bash(powershell.exe *)",
+      "Bash(py --version)",
+      "Bash(py -m ensurepip)",
+      "Bash(py -m pip --version)",
+      "Bash(py *)",
+      "Bash(uv sync *)",
+      "Bash(uv run *)",
+      "Bash(BOT_TOKEN=test uv run python -c \"from pejortryia.config import Settings; s = Settings\\(bot_token='test'\\); print\\('Config OK:', s.bot_token\\)\")",
+      "Bash(BOT_TOKEN=test uv run python -c \"from bot import create_bot, create_dispatcher; print\\('Bot assembly OK'\\)\")"
+    ]
+  }
+}
