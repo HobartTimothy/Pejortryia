@@ -14,7 +14,7 @@ class Settings(BaseSettings):
         extra="ignore",  # 忽略 .env 中多余的字段
     )
 
-    bot_token: str          # Telegram Bot API Token，必填
+    bot_token: str  # Telegram Bot API Token，必填
     log_level: str = "INFO"  # 日志级别，默认 INFO
     admin_ids: list[int] = []  # 管理员用户 ID 列表，环境变量以逗号分隔
 

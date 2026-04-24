@@ -5,6 +5,7 @@ description = "A generic Telegram bot framework"
 requires-python = ">=3.14"
 dependencies = [
     "aiogram>=3.19,<4",
+    "aiosqlite>=0.20,<1",
     "pydantic-settings>=2.7",
     "python-dotenv>=1.1",
 ]

@@ -17,8 +17,8 @@ class LoggingMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: MiddlewareHandler,  # 链中的下一个处理器
-        event: TelegramObject,       # 当前 Telegram 事件（Message / CallbackQuery 等）
-        data: dict[str, object],     # 上下文数据，传递给后续处理器
+        event: TelegramObject,  # 当前 Telegram 事件（Message / CallbackQuery 等）
+        data: dict[str, object],  # 上下文数据，传递给后续处理器
     ) -> None:
         start = time.perf_counter()
         logger.info("Update received: %s", type(event).__name__)

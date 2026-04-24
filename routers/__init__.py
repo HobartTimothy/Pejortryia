@@ -1,4 +1,5 @@
-from .start import router as start_router
+from .bookmark import router as bookmark_router
 from .help import router as help_router
+from .start import router as start_router
 
-__all__ = ["start_router", "help_router"]  # 汇总导出，新增路由需在此注册
+__all__ = ["bookmark_router", "help_router", "start_router"]
