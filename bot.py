@@ -1,8 +1,11 @@
 import logging
+import asyncio
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
 
 from config import settings
 from middleware import LoggingMiddleware
@@ -49,9 +52,35 @@ def create_bot() -> Bot:
 
 
 async def main() -> None:
-    """Bot 主流程：初始化日志 → 创建 Bot/Dispatcher → 开始长轮询。"""
+    """Bot 主流程：初始化日志 → 创建 Bot/Dispatcher → 启动 Webhook 服务。"""
     setup_logging(settings.log_level)
     bot = create_bot()
     dp = create_dispatcher()
-    logger.info("Starting Pejortryia bot...")
-    await dp.start_polling(bot)
+    app = web.Application()
+
+    SimpleRequestHandler(
+        dispatcher=dp,
+        bot=bot,
+        secret_token=settings.webhook_secret,
+    ).register(app, path=settings.webhook_path)
+    app.router.add_get("/health", lambda _: web.Response(text="ok"))
+    setup_application(app, dp, bot=bot)
+
+    webhook_url = f"{settings.webhook_base_url}{settings.webhook_path}"
+    await bot.set_webhook(
+        url=webhook_url,
+        secret_token=settings.webhook_secret,
+        drop_pending_updates=True,
+    )
+    logger.info("Webhook configured: %s", webhook_url)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, host=settings.webhook_host, port=settings.webhook_port)
+    await site.start()
+    logger.info("Webhook server started on %s:%s", settings.webhook_host, settings.webhook_port)
+
+    try:
+        await asyncio.Event().wait()
+    finally:
+        await runner.cleanup()
