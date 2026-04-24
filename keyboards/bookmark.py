@@ -1,11 +1,20 @@
+"""收藏功能的键盘构建模块。
+
+包含 InlineKeyboard 构建函数和 CallbackData 工厂类。
+列表键盘使用 InlineKeyboardBuilder，分页导航通过回调数据传递页码。
+"""
+
 from __future__ import annotations
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from utils import build_telegram_message_url
+
 PAGE_SIZE = 5
 
+# 消息类型 → 列表项图标映射
 MSG_TYPE_LABELS: dict[str, str] = {
     "text": "📝",
     "photo": "🖼️",
@@ -18,24 +27,23 @@ MSG_TYPE_LABELS: dict[str, str] = {
 
 
 class BookmarkList(CallbackData, prefix="bm_ls"):
+    """列表翻页回调，携带目标页码。"""
+
     page: int
 
 
 class BookmarkDetail(CallbackData, prefix="bm_dt"):
+    """查看收藏详情回调，携带收藏 ID 和返回页码。"""
+
     id: int
     page: int
 
 
 class BookmarkDelete(CallbackData, prefix="bm_dl"):
+    """删除收藏回调，携带收藏 ID 和返回页码。"""
+
     id: int
     page: int
-
-
-def _build_original_url(chat_id: int, message_id: int) -> str | None:
-    if chat_id > -1000000000000:
-        return None
-    channel_id = str(chat_id)[4:]
-    return f"https://t.me/c/{channel_id}/{message_id}"
 
 
 def build_list_keyboard(
@@ -43,6 +51,7 @@ def build_list_keyboard(
     page: int,
     total_pages: int,
 ) -> InlineKeyboardMarkup:
+    """构建收藏列表内联键盘：每条收藏一行按钮 + 底部翻页导航栏。"""
     builder = InlineKeyboardBuilder()
 
     for bm in bookmarks:
@@ -73,9 +82,10 @@ def build_detail_keyboard(
     chat_id: int | None = None,
     message_id: int | None = None,
 ) -> InlineKeyboardMarkup:
+    """构建收藏详情内联键盘：可查看原文链接（如适用）、删除、返回列表。"""
     builder = InlineKeyboardBuilder()
 
-    url = _build_original_url(chat_id, message_id) if chat_id and message_id else None
+    url = build_telegram_message_url(chat_id, message_id)
     if url:
         builder.button(text="🔗 查看原文", url=url)
 
@@ -87,6 +97,7 @@ def build_detail_keyboard(
 
 
 def _format_bookmark_label(bm: dict) -> str:
+    """格式化收藏列表项文本：图标 + 摘要（截断至 30 字符）。"""
     icon = MSG_TYPE_LABELS.get(bm["msg_type"], "📌")
     summary = bm.get("summary") or ""
     truncated = summary[:30] + ("..." if len(summary) > 30 else "")

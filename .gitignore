@@ -60,8 +60,6 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-bookmarks.db
-bookmarks.db-journal
 
 # Flask stuff:
 instance/

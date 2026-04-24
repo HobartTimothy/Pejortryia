@@ -1,3 +1,5 @@
+"""日志中间件 — 记录每条 Update 的类型和处理耗时。"""
+
 import logging
 import time
 from collections.abc import Awaitable, Callable
@@ -7,6 +9,7 @@ from aiogram.types import TelegramObject
 
 logger = logging.getLogger(__name__)
 
+# aiogram 中间件 handler 签名
 type MiddlewareHandler = Callable[[TelegramObject, dict[str, object]], Awaitable[None]]
 
 
